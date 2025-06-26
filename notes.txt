@@ -1,0 +1,9 @@
+Will probably need either a seperate client just for listening to the server 
+and another for sending or have two seperate threads 2 threads probably make more sense
+
+for now write it normal and just pretend
+
+because it's not blocking it may actually be fine idk
+
+
+all reads must return true or false
