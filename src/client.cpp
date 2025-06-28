@@ -1,7 +1,11 @@
 #include "client.h"
 
 Client::Client(asio::io_context &ctx)
-    : socket_(ctx), strand_(socket_.get_executor()) {}
+    : socket_(ctx), strand_(socket_.get_executor()) {
+  for (int i = 0; i < DEF_SIZE__; ++i) {
+    results[i] = "";
+  }
+}
 
 void Client::connect(const std::string &host, const std::string &port) {
   tcp::resolver r(socket_.get_executor());
@@ -25,7 +29,7 @@ void Client::shutdown() {
   std::cerr << "Disconnected." << std::endl;
 }
 
-void Client::login(char *name, char *pass) {
+void Client::login(int id, char *name, char *pass) {
   std::string msg = "LOGIN\n";
   msg += name;
   msg += "\n";
@@ -34,7 +38,7 @@ void Client::login(char *name, char *pass) {
   deliver(msg);
 }
 
-void Client::signup(char *name, char *pass) {
+void Client::signup(int id, char *name, char *pass) {
   std::string msg = "REGISTER\n";
   msg += name;
   msg += "\n";
@@ -43,7 +47,10 @@ void Client::signup(char *name, char *pass) {
   deliver(msg);
 }
 
-void Client::deliver(const std::string &msg) {
+void Client::
+
+    void
+    Client::deliver(const std::string &msg) {
   asio::post(strand_, [self = shared_from_this(), msg] {
     bool write_in_progress = !self->out_queue_.empty();
     self->out_queue_.push_back(msg + "\n");
