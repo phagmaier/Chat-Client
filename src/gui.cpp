@@ -13,9 +13,10 @@ void runGui() {
   State state = START;
   std::string currentRoom_;
   std::string usrName;
+  int room_id = -1;
 
   asio::io_context ctx;
-  auto client = Client(ctx);
+  Client client = Client(ctx);
   Start start = Start(state, font_heading);
   Signup signup = Signup(state, font_heading, font_text, client);
   Login login = Login(state, font_heading, font_text, client);
@@ -41,7 +42,7 @@ void runGui() {
     } else if (state == SIGNUP) {
       signup.draw(usrName);
     } else if (state == MENU) {
-      menu.draw(room_name);
+      menu.draw(room_name, room_id);
       if (state == ROOM) {
         room.open(room_name, usrName.c_str());
       }

@@ -19,12 +19,15 @@ public:
   void start();
   void login(int id, char *name, char *pass);
   void signup(int id, char *name, char *pass);
-  void logs(int id, ) std::unordered_map<int, std::string> results;
+  void logs(int id, int lim);
+  void menu(int id, std::string menu);
+  void chat(int id, char *message);
+  std::unordered_map<int, std::string> results;
 
 private:
   void connect(const std::string &host, const std::string &port);
   void shutdown();
-  void deliver(const std::string &msg);
+  void deliver(const std::string msg);
   void do_write();
   void read();
 

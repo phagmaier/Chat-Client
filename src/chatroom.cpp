@@ -1,25 +1,29 @@
 #include "chatroom.h"
 #include "theme.h"
 
-ChatRoom::ChatRoom(State &s, Font &font_heading, Font &font_text, Db &d)
-    : state_{s}, font_heading{font_heading}, font_text{font_text}, db_{d} {
+ChatRoom::ChatRoom(State &s, Font &font_heading, Font &font_text,
+                   Client &client)
+    : state_{s}, font_heading{font_heading}, font_text{font_text},
+      client_{client} {
   constexpr float pad = 32.0f;
   historyBox_ = {pad, 120, WIDTH - 2 * pad, HEIGHT - 300};
   inputBox_ = {pad, HEIGHT - 150, WIDTH - 220 - 2 * pad, 48};
   sendBtn_ = {inputBox_.x + inputBox_.width + 12, inputBox_.y, 120, 48};
   backBtn_ = {pad, 60, 100, 32};
 
-  // float cw = MeasureTextEx(font_heading, "A", Theme::HeadingSize, 0).x;
   float text_w = MeasureTextEx(font_text, "A", Theme::textSize, 0).x;
   colLim_ = int((historyBox_.width - Theme::PAD) / text_w);
   rowLim_ = int(historyBox_.height / (Theme::textSize + Theme::PAD / 2));
 }
 
-void ChatRoom::open(const std::string &roomName, const char *user) {
+void ChatRoom::open(const std::string &roomName, const char *user,
+                    int room_id) {
   room_ = roomName;
   user_ = user;
-  roomId_ = db_.getRoomId(roomName);
-  history_ = db_.get_logs(rowLim_ * 2, roomId_);
+  roomId_ = room_id;
+  // roomId_ = db_.getRoomId(roomName);
+  // history_ = client_.get_logs(rowLim_ * 2, roomId_);
+  client_.logs(roomId_, rowLim_);
   memset(input_, 0, sizeof(input_));
 
   textW = MeasureTextEx(font_heading, roomName.c_str(), Theme::HeadingSize,
@@ -44,7 +48,7 @@ void ChatRoom::draw() {
     if (input_[0]) {
       std::string line = std::string("[") + user_ + "]: " + input_;
       pushWrapped(line);
-      db_.insertMessage(room_, user_, input_);
+      client_.chat(roomId_, input_);
       std::memset(input_, 0, sizeof(input_));
     }
   }
@@ -74,7 +78,24 @@ void ChatRoom::pushWrapped(const std::string &s) {
     history_.push_back(s);
     return;
   }
-
   for (size_t i = 0; i < s.size(); i += colLim_)
     history_.push_back(s.substr(i, colLim_));
+}
+
+void ChatRoom::check_update() {
+  std::string chat = "";
+  int count = 0;
+  if (client_.results[roomId_].size()) {
+    std::string full = client_.results[roomId_];
+    for (char c : full) {
+      if (c == '\n' || count >= colLim_) {
+        history_.push_back(chat);
+        chat.clear();
+      } else {
+        chat += c;
+        ++count;
+      }
+    }
+    client_.results[roomId_].erase();
+  }
 }
