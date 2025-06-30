@@ -9,4 +9,5 @@
 #include "signup.h"
 #include "start.h"
 
+std::unordered_map<std::string, int> parse_rooms(std::string &str);
 void runGui();

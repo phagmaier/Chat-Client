@@ -35,7 +35,6 @@ private:
   std::vector<std::string> history_;
   std::string room_;
   const char *user_ = nullptr;
-  int roomId_ = 0;
 
   static constexpr int InLim = 256;
   char input_[InLim + 1]{};
@@ -43,6 +42,7 @@ private:
   int colLim_ = 0;
   int rowLim_ = 0;
   float textW;
+  int roomId_ = -100;
   // each room should get a specific range 100 different then the room
   // before it give each room a possible buffer of 100
   // messages that seems fair

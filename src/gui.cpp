@@ -1,4 +1,25 @@
 #include "gui.h"
+#include <unordered_map>
+
+std::unordered_map<std::string, int> parse_rooms(std::string &str) {
+  std::unordered_map<std::string, int> dic;
+  int count = 1;
+  char c = str[0];
+  int i = 0;
+  std::string room = "";
+  while (c != '\r') {
+    if (c == '\n') {
+      dic[room] = count;
+      room.clear();
+      ++count;
+    } else {
+      room += c;
+    }
+    ++i;
+    c = str[i];
+  }
+  return dic;
+}
 
 void runGui() {
 
@@ -13,10 +34,15 @@ void runGui() {
   State state = START;
   std::string currentRoom_;
   std::string usrName;
-  int room_id = -1;
-
   asio::io_context ctx;
   Client client = Client(ctx);
+  client.get_room_ids();
+  while (!client.results[0].size()) {
+    ;
+  }
+  std::unordered_map<std::string, int> room_ids =
+      parse_rooms(client.results[0]);
+
   Start start = Start(state, font_heading);
   Signup signup = Signup(state, font_heading, font_text, client);
   Login login = Login(state, font_heading, font_text, client);
@@ -42,9 +68,9 @@ void runGui() {
     } else if (state == SIGNUP) {
       signup.draw(usrName);
     } else if (state == MENU) {
-      menu.draw(room_name, room_id);
+      menu.draw(room_name);
       if (state == ROOM) {
-        room.open(room_name, usrName.c_str());
+        room.open(room_name, usrName.c_str(), room_ids[room_name]);
       }
     } else if (state == ROOM) {
       room.draw();

@@ -20,6 +20,8 @@ void Client::connect(const std::string &host, const std::string &port) {
       });
 }
 
+void Client::get_room_ids() { deliver("ROOMS\n\r\n"); }
+
 void Client::shutdown() {
   boost::system::error_code dummy;
   socket_.close(dummy);

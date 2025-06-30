@@ -22,6 +22,7 @@ public:
   void logs(int id, int lim);
   void menu(int id, std::string menu);
   void chat(int id, char *message);
+  void get_room_ids();
   std::unordered_map<int, std::string> results;
 
 private:
